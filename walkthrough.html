@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A plain-language walkthrough of the Splitwise-ish app — its five pages, the split math, and every file it ships with.">
+<title>Splitwise-ish · A walkthrough</title>
+<style>
+  :root {
+    --bg:      #EFEDE7;
+    --paper:   #F5F3ED;
+    --ink:     #111214;
+    --muted:   #6E6E67;
+    --rule:    #D6D2C6;
+    --marine:  #1D3159;
+    --orange:  #D95515;
+    --success: #2A6F4E;
+    --danger:  #B33A2A;
+    --code-bg: #E6E2D6;
+    --hi:      #F4E9C4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:      #17181A;
+      --paper:   #1F2022;
+      --ink:     #EAE7DE;
+      --muted:   #918F86;
+      --rule:    #2A2B2E;
+      --marine:  #8FA6DB;
+      --orange:  #F1834C;
+      --success: #63B58A;
+      --danger:  #E37868;
+      --code-bg: #212327;
+      --hi:      #3A3520;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:      #17181A;
+    --paper:   #1F2022;
+    --ink:     #EAE7DE;
+    --muted:   #918F86;
+    --rule:    #2A2B2E;
+    --marine:  #8FA6DB;
+    --orange:  #F1834C;
+    --success: #63B58A;
+    --danger:  #E37868;
+    --code-bg: #212327;
+    --hi:      #3A3520;
+  }
+  :root[data-theme="light"] {
+    --bg:      #EFEDE7;
+    --paper:   #F5F3ED;
+    --ink:     #111214;
+    --muted:   #6E6E67;
+    --rule:    #D6D2C6;
+    --marine:  #1D3159;
+    --orange:  #D95515;
+    --success: #2A6F4E;
+    --danger:  #B33A2A;
+    --code-bg: #E6E2D6;
+    --hi:      #F4E9C4;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Charter, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 17px;
+    line-height: 1.65;
+    font-feature-settings: "kern", "liga";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 6rem;
+  }
+
+  a { color: var(--marine); text-underline-offset: 0.15em; }
+  a:hover { color: var(--orange); }
+  :focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; border-radius: 2px; }
+
+  code, kbd, .mono, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-variant-ligatures: none;
+  }
+  code {
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.08em 0.35em;
+    border-radius: 3px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--ink);
+    padding: 1rem 1.15rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 13.5px;
+    line-height: 1.55;
+    border-left: 3px solid var(--marine);
+    margin: 1rem 0;
+  }
+  pre code { background: none; padding: 0; white-space: pre; }
+  .caret { color: var(--muted); user-select: none; }
+  .fileref {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+    letter-spacing: 0.01em;
+    display: block;
+    margin-top: 0.35rem;
+  }
+
+  /* -------- Masthead -------- */
+  .masthead {
+    padding-top: 1rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 3rem;
+  }
+  .brow {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--orange);
+    margin-bottom: 1.25rem;
+  }
+  h1 {
+    font-family: Georgia, "Iowan Old Style", serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 5.5vw, 2.9rem);
+    line-height: 1.1;
+    text-wrap: balance;
+    letter-spacing: -0.015em;
+    margin: 0 0 1rem;
+  }
+  .dek {
+    font-size: 1.15rem;
+    color: var(--muted);
+    line-height: 1.55;
+    text-wrap: pretty;
+    max-width: 60ch;
+    margin: 0 0 1.5rem;
+  }
+  .metaline {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+
+  /* -------- Sections -------- */
+  section { margin-top: 3.5rem; }
+  section > p { max-width: 62ch; }
+
+  h2 {
+    font-family: Georgia, "Iowan Old Style", serif;
+    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 0.85rem;
+  }
+  .sec-brow {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  h3 {
+    font-family: Georgia, serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin: 1.5rem 0 0.5rem;
+    text-wrap: balance;
+  }
+  p { margin: 0 0 1rem; }
+  strong { font-weight: 700; }
+  em     { font-style: italic; }
+
+  /* -------- Term callouts -------- */
+  .term {
+    background: var(--paper);
+    border-left: 3px solid var(--marine);
+    padding: 0.75rem 1rem;
+    margin: 1.25rem 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    border-radius: 0 3px 3px 0;
+  }
+  .term > b {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--marine);
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+  .term span {
+    font-family: Charter, Georgia, serif;
+    color: var(--ink);
+  }
+
+  /* -------- Pages grid -------- */
+  .pages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .page-card {
+    background: var(--paper);
+    padding: 1rem 1.1rem;
+    border-radius: 3px;
+    border-top: 2px solid var(--marine);
+  }
+  .page-card h4 {
+    margin: 0 0 0.35rem;
+    font-family: Georgia, serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+  .page-card p {
+    margin: 0 0 0.5rem;
+    font-size: 0.93rem;
+    color: var(--muted);
+  }
+  .page-card .fileref { margin: 0; }
+
+  /* -------- Journey steps -------- */
+  .step {
+    display: grid;
+    grid-template-columns: 2.75rem 1fr;
+    gap: 1.25rem;
+    margin: 0 0 2.25rem;
+  }
+  .step-num {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--orange);
+    text-align: right;
+    padding-top: 0.15rem;
+    line-height: 1;
+    position: relative;
+  }
+  .step-num::after {
+    content: "";
+    position: absolute;
+    right: 0.25rem;
+    top: 2.25rem;
+    bottom: -2rem;
+    width: 1px;
+    background: var(--rule);
+  }
+  .step:last-child .step-num::after { display: none; }
+  .step-body h3 { margin-top: 0; font-size: 1.1rem; }
+  .step-body p:last-child { margin-bottom: 0; }
+
+  /* -------- Diagrams -------- */
+  figure { margin: 1.75rem 0; }
+  figcaption {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-top: 0.75rem;
+  }
+  .diagram {
+    background: var(--paper);
+    padding: 1.5rem 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+  .diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  svg text {
+    font-family: Charter, Georgia, serif;
+    fill: var(--ink);
+  }
+  svg .lbl {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    fill: var(--muted);
+  }
+  svg .amt {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* -------- Balance table -------- */
+  .table-wrap { overflow-x: auto; margin: 1.25rem 0; }
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.95rem;
+    min-width: 480px;
+  }
+  table.data th, table.data td {
+    padding: 0.6rem 0.85rem;
+    text-align: left;
+    border-bottom: 1px solid var(--rule);
+  }
+  table.data th {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  table.data td.num { text-align: right; }
+  .plus   { color: var(--success); font-weight: 700; }
+  .minus  { color: var(--danger);  font-weight: 700; }
+
+  /* -------- File map -------- */
+  .tree {
+    background: var(--paper);
+    padding: 1.15rem 1.25rem;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13.5px;
+    line-height: 1.75;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+  .tree .comment { color: var(--muted); }
+  .tree .dir { color: var(--marine); font-weight: 600; }
+
+  /* -------- Glossary -------- */
+  .gloss {
+    margin: 1.5rem 0;
+    padding: 0;
+  }
+  .gloss dt {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 700;
+    color: var(--marine);
+    font-size: 0.92rem;
+    margin-top: 1rem;
+  }
+  .gloss dd {
+    margin: 0.2rem 0 0;
+    color: var(--ink);
+    max-width: 62ch;
+  }
+  .gloss dd + dd { margin-top: 0.15rem; }
+
+  /* -------- Divider -------- */
+  hr.rule {
+    border: 0;
+    height: 1px;
+    background: var(--rule);
+    margin: 3rem 0 1rem;
+  }
+
+  /* -------- Utilities -------- */
+  .mark {
+    background: var(--hi);
+    padding: 0.05em 0.25em;
+    border-radius: 2px;
+  }
+
+  /* -------- Reduced motion -------- */
+  @media (prefers-reduced-motion: no-preference) {
+    section { animation: rise 0.5s ease both; animation-timeline: view(); animation-range: entry 0% entry 30%; }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+
+</head><body><div class="wrap">
+
+  <header class="masthead">
+    <div class="brow">Splitwise-ish · A walkthrough</div>
+    <h1>How the app works, one journey at a time.</h1>
+    <p class="dek">A plain-language tour of every page, every calculation, and every file — written for anyone opening the code for the first time.</p>
+    <div class="metaline">
+      <span>Repo · <a href="https://github.com/uvabd17/rahul_varun">uvabd17/rahul_varun</a></span>
+      <span>Read time · about 15 min</span>
+    </div>
+  </header>
+
+  <!-- ================================================================ -->
+  <section>
+    <div class="sec-brow">01 — Premise</div>
+    <h2>What this app is, in one paragraph.</h2>
+    <p>Five friends — Alice, Bob, Charlie, David, and Emma — go out and buy things together. One person pays the bill. Everyone who was in on it owes their share back. The app remembers every expense, then works out who owes whom.</p>
+    <p>It's a small web page you open by double-clicking <code>index.html</code>. There's no server, no login, no database. Everything lives inside your browser.</p>
+
+    <div class="term">
+      <b>Web page</b>
+      <span>A document made of HTML (structure), CSS (looks), and JavaScript (behaviour). Your browser reads all three and paints them onto the screen.</span>
+    </div>
+    <div class="term">
+      <b>Browser</b>
+      <span>The program you use to visit websites — Chrome, Firefox, Safari. It runs HTML, CSS, and JavaScript.</span>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <div class="sec-brow">02 — Mental model</div>
+    <h2>The one big idea.</h2>
+    <p>Every page in the app is a different way of looking at <em>the same list</em>. That list is your expenses, and it lives in a corner of the browser called <code>localStorage</code>.</p>
+
+    <div class="term">
+      <b>localStorage</b>
+      <span>A small storage box built into every browser. You can put text into it under a name, and it stays even if you close the tab or shut the computer down. Each website has its own box.</span>
+    </div>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 680 340" role="img" aria-label="Add-expense form saves to localStorage, which feeds every page">
+        <!-- Form on left -->
+        <rect x="30" y="130" width="140" height="80" rx="4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="100" y="160" text-anchor="middle" font-size="14">Add Expense</text>
+        <text x="100" y="180" text-anchor="middle" font-size="12" class="lbl">form</text>
+        <text x="100" y="230" text-anchor="middle" font-size="11" class="lbl">add-expense.html</text>
+
+        <!-- Arrow to storage -->
+        <path d="M 175 170 L 258 170" stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+        <text x="215" y="160" text-anchor="middle" font-size="11" class="lbl">save</text>
+
+        <!-- Storage box in middle -->
+        <rect x="260" y="120" width="140" height="100" rx="4" fill="var(--hi)" stroke="var(--orange)" stroke-width="2"/>
+        <text x="330" y="155" text-anchor="middle" font-size="13" font-weight="700">localStorage</text>
+        <text x="330" y="178" text-anchor="middle" font-size="11" class="mono" style="font-family: ui-monospace, monospace;">key: "expenses"</text>
+        <text x="330" y="197" text-anchor="middle" font-size="11" class="mono" style="font-family: ui-monospace, monospace;">value: [ … ]</text>
+
+        <!-- Fan-out to 5 pages -->
+        <path d="M 405 145 L 500 60"  stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+        <path d="M 405 158 L 500 130" stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+        <path d="M 405 170 L 500 200" stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+        <path d="M 405 183 L 500 270" stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+        <path d="M 405 195 L 500 320" stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+
+        <g font-size="13">
+          <rect x="505" y="45"  width="150" height="30" rx="3" fill="var(--paper)" stroke="currentColor" stroke-width="1"/>
+          <text x="515" y="65">Add Expense</text>
+          <rect x="505" y="115" width="150" height="30" rx="3" fill="var(--paper)" stroke="currentColor" stroke-width="1"/>
+          <text x="515" y="135">Display Expenses</text>
+          <rect x="505" y="185" width="150" height="30" rx="3" fill="var(--paper)" stroke="currentColor" stroke-width="1"/>
+          <text x="515" y="205">Split Calculation</text>
+          <rect x="505" y="255" width="150" height="30" rx="3" fill="var(--paper)" stroke="currentColor" stroke-width="1"/>
+          <text x="515" y="275">Balance Summary</text>
+          <rect x="505" y="305" width="150" height="30" rx="3" fill="var(--paper)" stroke="currentColor" stroke-width="1"/>
+          <text x="515" y="325">Reports</text>
+        </g>
+
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 Z" fill="currentColor"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption>The form writes. Every page reads.</figcaption>
+    </figure>
+
+    <p>Save, edit, or delete an expense — it changes the list. Then every page you visit shows you the fresh answer, because they all read from the same list.</p>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <div class="sec-brow">03 — Cast</div>
+    <h2>The people and the categories.</h2>
+    <p>The app hard-codes five members and six categories. They live in one file so every page shares the exact same list.</p>
+
+    <pre><code><span class="caret">// js/utils.js</span>
+const MEMBERS = ['Alice', 'Bob', 'Charlie', 'David', 'Emma'];
+
+const CATEGORIES = [
+  { name: 'Food',          icon: '🍕', color: '#f97316' },
+  { name: 'Travel',        icon: '🚖', color: '#3b82f6' },
+  { name: 'Shopping',      icon: '🛍️', color: '#ec4899' },
+  { name: 'Entertainment', icon: '🎬', color: '#8b5cf6' },
+  { name: 'Bills',         icon: '💡', color: '#10b981' },
+  { name: 'Others',        icon: '📦', color: '#6b7280' }
+];</code></pre>
+    <span class="fileref">js/utils.js</span>
+
+    <div class="term">
+      <b>Constant</b>
+      <span><code>const</code> means "this value never changes." Once we set <code>MEMBERS</code>, no other code is allowed to swap Alice for someone else.</span>
+    </div>
+    <div class="term">
+      <b>Array</b>
+      <span>A list, written with square brackets: <code>['Alice', 'Bob']</code>. Order matters.</span>
+    </div>
+    <div class="term">
+      <b>Object</b>
+      <span>A bundle of labelled values, written with curly braces: <code>{ name: 'Food', icon: '🍕' }</code>. Each label is called a <em>key</em>.</span>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <div class="sec-brow">04 — Tour</div>
+    <h2>The five pages, at a glance.</h2>
+    <div class="pages">
+      <div class="page-card">
+        <h4>Add Expense</h4>
+        <p>The form. Name, amount, who paid, category, date, and which members shared it.</p>
+        <span class="fileref">add-expense.html</span>
+      </div>
+      <div class="page-card">
+        <h4>Display Expenses</h4>
+        <p>The table. Every expense, with search, category filter, sort, and edit/delete.</p>
+        <span class="fileref">display-expenses.html</span>
+      </div>
+      <div class="page-card">
+        <h4>Split Calculation</h4>
+        <p>Every expense grouped by category, showing per-person share and who owes whom.</p>
+        <span class="fileref">split-calculation.html</span>
+      </div>
+      <div class="page-card">
+        <h4>Balance Summary</h4>
+        <p>What each member paid, what they should have paid, and the difference.</p>
+        <span class="fileref">balance-summary.html</span>
+      </div>
+      <div class="page-card">
+        <h4>Reports</h4>
+        <p>Totals, filters, and two charts — pie by category, bar by member.</p>
+        <span class="fileref">reports.html</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ================================================================ -->
+  <section>
+    <div class="sec-brow">05 — The journey</div>
+    <h2>What happens when you add the Pizza expense.</h2>
+    <p>To learn how the app really works, we'll follow one action all the way through the code: paying <strong>₹900 for a pizza</strong> that Alice paid for and shared with Bob and Charlie. Six steps, five files.</p>
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>You open the form.</h3>
+        <p>You click <em>Add Expense</em> in the top bar. The browser loads <code>add-expense.html</code>. The page shows a header and an empty form with fields for name, amount, paid-by, category, date, and checkboxes for members.</p>
+        <p>Just before the form is drawn, three small script files load: <code>utils.js</code> (the shared lists), <code>storage.js</code> (the save/load helpers), and <code>app.js</code> (the top bar).</p>
+        <pre><code>&lt;script src="js/utils.js"&gt;&lt;/script&gt;
+&lt;script src="js/storage.js"&gt;&lt;/script&gt;
+&lt;script src="js/app.js"&gt;&lt;/script&gt;
+&lt;script&gt;mountNav('add');&lt;/script&gt;</code></pre>
+        <span class="fileref">add-expense.html</span>
+
+        <div class="term">
+          <b>Script</b>
+          <span>A file of JavaScript. Loading it makes its functions available to the page.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>The form fills itself.</h3>
+        <p>The dropdowns for <em>Paid By</em> and <em>Category</em> start empty in the HTML. A tiny piece of code in <code>expenses.js</code> loops over <code>MEMBERS</code> and <code>CATEGORIES</code> and inserts one <code>&lt;option&gt;</code> for each. It also builds a checkbox for every member.</p>
+        <pre><code>MEMBERS.forEach(m =&gt; {
+  paidBySelect.insertAdjacentHTML('beforeend', `&lt;option value="${m}"&gt;${m}&lt;/option&gt;`);
+  membersDiv.insertAdjacentHTML('beforeend', `
+    &lt;label class="checkbox-chip"&gt;
+      &lt;input type="checkbox" name="shared" value="${m}"&gt; ${m}
+    &lt;/label&gt;
+  `);
+});</code></pre>
+        <span class="fileref">js/expenses.js · initAddExpensePage</span>
+
+        <div class="term">
+          <b>forEach</b>
+          <span>"Do this once for each item in the list." Here, once for each member.</span>
+        </div>
+        <div class="term">
+          <b>Template literal</b>
+          <span>A string wrapped in backticks. Anything inside <code>${…}</code> gets replaced with its value, so <code>`Hello, ${m}`</code> becomes <code>Hello, Alice</code>.</span>
+        </div>
+        <div class="term">
+          <b>DOM</b>
+          <span>The <em>Document Object Model</em> — a live tree of every element on the page. When JavaScript changes the DOM, the browser redraws the screen.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>You type "Pizza", "900", pick Alice, tick Bob and Charlie, and press <em>Add Expense</em>.</h3>
+        <p>Pressing the button submits the form. The page has been told to listen for that submit and run a function instead of reloading.</p>
+        <pre><code>form.addEventListener('submit', (e) =&gt; {
+  e.preventDefault();
+  const name     = nameInput.value.trim();
+  const amount   = parseFloat(amountInput.value);
+  const paidBy   = paidBySelect.value;
+  const category = categorySelect.value;
+  const date     = dateInput.value;
+  const sharedBy = [...document.querySelectorAll('input[name="shared"]:checked')]
+                     .map(el =&gt; el.value);
+  // …validation…
+});</code></pre>
+        <span class="fileref">js/expenses.js · initAddExpensePage</span>
+
+        <div class="term">
+          <b>Event listener</b>
+          <span>A little watcher attached to something on the page (a button, a form). When the thing you're watching for happens ("someone submitted the form"), it runs your code.</span>
+        </div>
+        <div class="term">
+          <b>preventDefault()</b>
+          <span>Without this, submitting a form would reload the whole page. We want to handle it ourselves, so we cancel the default.</span>
+        </div>
+        <div class="term">
+          <b>querySelectorAll</b>
+          <span>"Give me every element on the page that matches this pattern." <code>input[name="shared"]:checked</code> means "every ticked checkbox named shared."</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>The form checks that everything makes sense.</h3>
+        <p>Before saving anything, the code walks through six rules. If a rule fails, it writes a small red message under the offending field and stops.</p>
+        <ol style="max-width: 60ch;">
+          <li>Expense name is not empty.</li>
+          <li>Amount is a number greater than zero.</li>
+          <li>Someone was picked as the payer.</li>
+          <li>A category was chosen.</li>
+          <li>A date was picked.</li>
+          <li>At least one member is ticked <em>and</em> the payer is among them.</li>
+        </ol>
+        <pre><code>if (!name)                 { showError('name',   'Expense name is required.'); ok = false; }
+if (!amount || amount &lt;= 0){ showError('amount', 'Amount must be greater than zero.'); ok = false; }
+if (sharedBy.length === 0) { showError('shared', 'Select at least one member.'); ok = false; }
+if (paidBy && !sharedBy.includes(paidBy)) {
+  showError('shared', 'The payer must also be one of the selected members.');
+  ok = false;
+}
+if (!ok) return;</code></pre>
+        <span class="fileref">js/expenses.js · initAddExpensePage</span>
+
+        <p>Our pizza passes every check.</p>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>The expense is saved to <code>localStorage</code>.</h3>
+        <p>The form calls a helper called <code>addExpense</code>. That helper does three quiet things: it reads the current list, appends the new expense with a fresh <code>id</code>, and writes the whole list back out.</p>
+        <pre><code>const addExpense = (obj) =&gt; {
+  const list = loadExpenses();
+  const id = Date.now() + Math.floor(Math.random() * 1000);
+  list.push({ id, ...obj });
+  saveExpenses(list);
+  return id;
+};</code></pre>
+        <span class="fileref">js/storage.js</span>
+
+        <p>What lands in storage looks exactly like this:</p>
+        <pre><code>{
+  id: 1720252831234,
+  expense: "Pizza",
+  amount: 900,
+  paidBy: "Alice",
+  category: "Food",
+  sharedBy: ["Alice", "Bob", "Charlie"],
+  date: "2026-07-06"
+}</code></pre>
+
+        <div class="term">
+          <b>id</b>
+          <span>A unique number for this expense. Made from the current time (<code>Date.now()</code>) plus a small random number so two expenses added in the same millisecond don't collide.</span>
+        </div>
+        <div class="term">
+          <b>Spread (<code>...obj</code>)</b>
+          <span>"Unpack every field of <code>obj</code> right here." So <code>{ id, ...obj }</code> means "a new object with <code>id</code> plus everything <code>obj</code> already had."</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h3>Every open page hears the news.</h3>
+        <p>After writing to storage, <code>saveExpenses</code> shouts an announcement into the page:</p>
+        <pre><code>const saveExpenses = (list) =&gt; {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  window.dispatchEvent(new CustomEvent('expenses-updated'));
+};</code></pre>
+        <span class="fileref">js/storage.js</span>
+
+        <p>Every page that shows data has already asked to be told when this happens:</p>
+        <pre><code>window.addEventListener('expenses-updated', render);</code></pre>
+        <span class="fileref">js/split.js, js/balance.js, js/reports.js, js/expenses.js</span>
+
+        <p>So the moment the pizza is saved, the table, the split page, the balances, and the reports all rebuild themselves from the new list. If a second tab is open, the browser's own <code>storage</code> event fires there too, and <code>app.js</code> forwards it into the same <code>expenses-updated</code> announcement.</p>
+        <pre><code>window.addEventListener('storage', (e) =&gt; {
+  if (e.key === STORAGE_KEY) {
+    window.dispatchEvent(new CustomEvent('expenses-updated'));
+  }
+});</code></pre>
+        <span class="fileref">js/app.js</span>
+
+        <div class="term">
+          <b>Custom event</b>
+          <span>A message you make up (like <code>'expenses-updated'</code>) and broadcast into the page. Anything listening for that message runs its handler.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ================================================================ -->
+  <section>
+    <div class="sec-brow">06 — The math, part one</div>
+    <h2>How the split works.</h2>
+    <p>A split is one line of arithmetic: <em>amount ÷ number of people who shared it = share per person</em>.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 640 200" role="img" aria-label="Pizza 900 divided into three 300 shares">
+        <!-- big total -->
+        <rect x="30" y="70" width="180" height="60" rx="4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="120" y="105" text-anchor="middle" font-size="20" class="amt" font-weight="700">₹900</text>
+        <text x="120" y="150" text-anchor="middle" font-size="12" class="lbl">Pizza · paid by Alice</text>
+
+        <!-- divide symbol -->
+        <text x="240" y="108" text-anchor="middle" font-size="26" font-weight="700">÷</text>
+
+        <!-- 3 shares -->
+        <text x="278" y="108" text-anchor="middle" font-size="22" font-weight="700">3</text>
+        <text x="278" y="150" text-anchor="middle" font-size="11" class="lbl">shared by</text>
+
+        <!-- equals -->
+        <text x="315" y="108" text-anchor="middle" font-size="24" font-weight="700">=</text>
+
+        <!-- three share boxes -->
+        <g>
+          <rect x="345" y="70"  width="90" height="60" rx="4" fill="var(--paper)" stroke="currentColor" stroke-width="1.5"/>
+          <text x="390" y="98"  text-anchor="middle" font-size="16" class="amt" font-weight="700">₹300</text>
+          <text x="390" y="118" text-anchor="middle" font-size="11">Alice</text>
+
+          <rect x="445" y="70"  width="90" height="60" rx="4" fill="var(--paper)" stroke="currentColor" stroke-width="1.5"/>
+          <text x="490" y="98"  text-anchor="middle" font-size="16" class="amt" font-weight="700">₹300</text>
+          <text x="490" y="118" text-anchor="middle" font-size="11">Bob</text>
+
+          <rect x="545" y="70"  width="90" height="60" rx="4" fill="var(--paper)" stroke="currentColor" stroke-width="1.5"/>
+          <text x="590" y="98"  text-anchor="middle" font-size="16" class="amt" font-weight="700">₹300</text>
+          <text x="590" y="118" text-anchor="middle" font-size="11">Charlie</text>
+        </g>
+        <text x="490" y="150" text-anchor="middle" font-size="11" class="lbl">share per person</text>
+      </svg>
+      <figcaption>Pizza · ₹900 ÷ 3 = ₹300 each</figcaption>
+    </figure>
+
+    <p>Alice paid the full ₹900. Her own share is ₹300, so she is effectively out of pocket by ₹600. The other ₹600 is what she's owed:</p>
+    <ul style="max-width: 60ch;">
+      <li>Bob owes Alice ₹300.</li>
+      <li>Charlie owes Alice ₹300.</li>
+    </ul>
+
+    <p>In code, the same idea is one line inside a loop that runs over every expense:</p>
+    <pre><code>const share = Number(e.amount) / e.sharedBy.length;
+e.sharedBy.forEach(m =&gt; {
+  if (m !== e.paidBy) owes[m][e.paidBy] += share;
+});</code></pre>
+    <span class="fileref">js/balance.js · computeDebts</span>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <div class="sec-brow">07 — The math, part two</div>
+    <h2>How the balances work.</h2>
+    <p>Once several expenses exist, the app looks at each member and asks two questions:</p>
+    <ul style="max-width: 60ch;">
+      <li><strong>Paid</strong> — how much money did they hand over in total?</li>
+      <li><strong>Share</strong> — how much did they actually consume, summed across every expense they were in?</li>
+    </ul>
+    <p>Then it subtracts one from the other:</p>
+    <p style="font-family: ui-monospace, monospace; font-size: 1.05rem; text-align: center; padding: 1rem; background: var(--paper); border-radius: 3px; max-width: 62ch;"><strong>Balance = Paid − Share</strong></p>
+    <p>A positive balance means the group owes <em>you</em>. A negative balance means <em>you</em> owe the group. Loading all six sample expenses gives:</p>
+
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr><th>Member</th><th class="num">Paid</th><th class="num">Share</th><th class="num">Balance</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Alice</td>   <td class="num">₹900</td>  <td class="num">₹600</td>  <td class="num plus">+₹300</td></tr>
+          <tr><td>Bob</td>     <td class="num">₹1,800</td><td class="num">₹1,150</td><td class="num plus">+₹650</td></tr>
+          <tr><td>Charlie</td> <td class="num">₹500</td>  <td class="num">₹1,150</td><td class="num minus">−₹650</td></tr>
+          <tr><td>David</td>   <td class="num">₹400</td>  <td class="num">₹650</td>  <td class="num minus">−₹250</td></tr>
+          <tr><td>Emma</td>    <td class="num">₹300</td>  <td class="num">₹350</td>  <td class="num minus">−₹50</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The code that produces this table is small and readable:</p>
+    <pre><code>const computeBalances = (expenses) =&gt; {
+  const paid  = Object.fromEntries(MEMBERS.map(m =&gt; [m, 0]));
+  const share = Object.fromEntries(MEMBERS.map(m =&gt; [m, 0]));
+
+  expenses.forEach(e =&gt; {
+    paid[e.paidBy] += Number(e.amount);
+    const s = Number(e.amount) / e.sharedBy.length;
+    e.sharedBy.forEach(m =&gt; { share[m] += s; });
+  });
+
+  return MEMBERS.map(m =&gt; ({
+    member:  m,
+    paid:    paid[m],
+    share:   share[m],
+    balance: paid[m] - share[m]
+  }));
+};</code></pre>
+    <span class="fileref">js/balance.js · computeBalances</span>
+
+    <div class="term">
+      <b>Object.fromEntries + map</b>
+      <span>A two-step trick: <code>MEMBERS.map(m =&gt; [m, 0])</code> turns the names list into pairs like <code>['Alice', 0]</code>. <code>Object.fromEntries</code> then folds those pairs into <code>{ Alice: 0, Bob: 0, … }</code> — a running total for every member, starting at zero.</span>
+    </div>
+    <div class="term">
+      <b><code>+=</code></b>
+      <span>Short for "add this to what's already there." <code>paid[e.paidBy] += 900</code> means "increase Alice's paid total by 900."</span>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <div class="sec-brow">08 — The math, part three</div>
+    <h2>Who owes whom, without the noise.</h2>
+    <p>A naïve list of debts would tell you that Alice owes Bob ₹300 for the Biryani <em>and</em> Bob owes Alice ₹300 for the Pizza. Two payments, but they cancel out. The app nets those out before showing you anything.</p>
+
+    <p>Between every pair, it looks at what A owes B and what B owes A, subtracts one from the other, and keeps only the leftover in the direction it belongs.</p>
+
+    <pre><code>for (let i = 0; i &lt; MEMBERS.length; i++) {
+  for (let j = i + 1; j &lt; MEMBERS.length; j++) {
+    const a = MEMBERS[i], b = MEMBERS[j];
+    const diff = owes[a][b] - owes[b][a];
+    if      (diff &gt;  0.005) debts.push({ from: a, to: b, amount: diff });
+    else if (diff &lt; -0.005) debts.push({ from: b, to: a, amount: -diff });
+  }
+}</code></pre>
+    <span class="fileref">js/balance.js · computeDebts</span>
+
+    <p>With the six sample expenses loaded, everything settles down to just four payments:</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 620 330" role="img" aria-label="Who owes whom network diagram">
+        <!-- circles for members -->
+        <g font-size="13" text-anchor="middle">
+          <!-- Alice top-left -->
+          <circle cx="130" cy="80"  r="34" fill="var(--paper)" stroke="var(--success)" stroke-width="2"/>
+          <text x="130" y="76" font-weight="700">Alice</text>
+          <text x="130" y="94" font-size="11" class="amt plus" fill="var(--success)">+₹300</text>
+
+          <!-- Bob top-right -->
+          <circle cx="490" cy="80"  r="38" fill="var(--paper)" stroke="var(--success)" stroke-width="2"/>
+          <text x="490" y="76" font-weight="700">Bob</text>
+          <text x="490" y="94" font-size="11" class="amt plus" fill="var(--success)">+₹650</text>
+
+          <!-- Charlie middle -->
+          <circle cx="310" cy="180" r="38" fill="var(--paper)" stroke="var(--danger)" stroke-width="2"/>
+          <text x="310" y="176" font-weight="700">Charlie</text>
+          <text x="310" y="194" font-size="11" class="amt minus" fill="var(--danger)">−₹650</text>
+
+          <!-- David bottom-right -->
+          <circle cx="490" cy="270" r="34" fill="var(--paper)" stroke="var(--danger)" stroke-width="2"/>
+          <text x="490" y="266" font-weight="700">David</text>
+          <text x="490" y="284" font-size="11" class="amt minus" fill="var(--danger)">−₹250</text>
+
+          <!-- Emma bottom-left -->
+          <circle cx="130" cy="270" r="30" fill="var(--paper)" stroke="var(--danger)" stroke-width="2"/>
+          <text x="130" y="266" font-weight="700">Emma</text>
+          <text x="130" y="284" font-size="11" class="amt minus" fill="var(--danger)">−₹50</text>
+        </g>
+
+        <!-- arrows: Charlie -> Alice -->
+        <path d="M 288 154 L 155 108" stroke="var(--marine)" stroke-width="1.6" fill="none" marker-end="url(#arr2)"/>
+        <text x="200" y="120" font-size="12" class="amt" fill="var(--marine)">₹300</text>
+
+        <!-- Charlie -> Bob -->
+        <path d="M 340 165 L 458 100" stroke="var(--marine)" stroke-width="1.6" fill="none" marker-end="url(#arr2)"/>
+        <text x="415" y="140" font-size="12" class="amt" fill="var(--marine)">₹350</text>
+
+        <!-- David -> Bob -->
+        <path d="M 490 232 L 490 122" stroke="var(--marine)" stroke-width="1.6" fill="none" marker-end="url(#arr2)"/>
+        <text x="510" y="180" font-size="12" class="amt" fill="var(--marine)">₹300</text>
+
+        <!-- Emma -> David -->
+        <path d="M 158 273 L 456 270" stroke="var(--marine)" stroke-width="1.6" fill="none" marker-end="url(#arr2)"/>
+        <text x="300" y="264" font-size="12" class="amt" fill="var(--marine)">₹50</text>
+
+        <defs>
+          <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 Z" fill="var(--marine)"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption>Green circles are owed money. Red circles owe money. Arrows point in the direction of payment.</figcaption>
+    </figure>
+
+    <p>Notice something. Alice and Bob don't exchange money at all — their debts to each other cancelled out. And Emma only owes David ₹50, not ₹200, because David also owed her ₹150 from the Bus expense.</p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ================================================================ -->
+  <section>
+    <div class="sec-brow">09 — The code, mapped</div>
+    <h2>What every file does.</h2>
+    <div class="tree">
+<span class="dir">rahul_varun/</span>
+├── index.html                 <span class="comment">// small page that redirects to add-expense.html</span>
+├── add-expense.html           <span class="comment">// the form (page 1)</span>
+├── display-expenses.html      <span class="comment">// the table with search / filter / sort (page 2)</span>
+├── split-calculation.html     <span class="comment">// grouped by category, share + who-owes-whom (page 3)</span>
+├── balance-summary.html       <span class="comment">// net balances and settled debts (page 4)</span>
+├── reports.html               <span class="comment">// totals, filters, and Chart.js pie + bar (page 5)</span>
+│
+├── <span class="dir">css/</span>
+│   ├── style.css              <span class="comment">// tokens, buttons, forms, tables, cards</span>
+│   └── responsive.css         <span class="comment">// tablet + mobile layouts</span>
+│
+└── <span class="dir">js/</span>
+    ├── utils.js               <span class="comment">// MEMBERS, CATEGORIES, formatMoney, formatDate, escapeHtml</span>
+    ├── storage.js             <span class="comment">// load/save/add/update/delete + sample data</span>
+    ├── app.js                 <span class="comment">// top-bar nav + cross-tab storage bridge</span>
+    ├── expenses.js            <span class="comment">// runs the form AND the table (both pages)</span>
+    ├── split.js               <span class="comment">// grouping + per-expense share math</span>
+    ├── balance.js             <span class="comment">// computeBalances + computeDebts</span>
+    └── reports.js             <span class="comment">// filters, aggregations, Chart.js pie + bar</span>
+    </div>
+
+    <p>Files that share behaviour share code. The table page and the form page both load <code>expenses.js</code> because it holds the render logic and the submit handler; each page only wires up the parts it can find on itself.</p>
+    <pre><code>const initAddExpensePage = () =&gt; {
+  const form = document.getElementById('expense-form');
+  if (!form) return;      <span class="caret">// not the add page — bail out</span>
+  // …
+};</code></pre>
+    <span class="fileref">js/expenses.js</span>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <div class="sec-brow">10 — Vocabulary</div>
+    <h2>Every term in one place.</h2>
+    <dl class="gloss">
+      <dt>HTML</dt>
+      <dd>HyperText Markup Language. The tags (<code>&lt;div&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;input&gt;</code>) that describe what's on the page.</dd>
+
+      <dt>CSS</dt>
+      <dd>Cascading Style Sheets. The rules that decide what things look like — colour, size, spacing, layout.</dd>
+
+      <dt>JavaScript</dt>
+      <dd>The programming language that runs in the browser. It handles clicks, updates the page, does the maths.</dd>
+
+      <dt>ES6</dt>
+      <dd>A modern version of JavaScript (also called ES2015). It added the arrow function (<code>=&gt;</code>), <code>const</code>, template literals, and other pieces the code relies on.</dd>
+
+      <dt>DOM</dt>
+      <dd>Document Object Model. The live tree of every element on the page. Changing the DOM changes what you see.</dd>
+
+      <dt>localStorage</dt>
+      <dd>A small storage box per website, built into every browser. Text goes in under a key; text comes out later — even after the tab closes.</dd>
+
+      <dt>JSON</dt>
+      <dd>JavaScript Object Notation. A text format for objects and lists. <code>JSON.stringify(list)</code> turns data into text; <code>JSON.parse(text)</code> turns it back.</dd>
+
+      <dt>Event / Event listener</dt>
+      <dd>An event is something that happens (a click, a submit, a change). A listener is a function set up to run when a particular event happens.</dd>
+
+      <dt>Custom event</dt>
+      <dd>An event we invent ourselves (<code>'expenses-updated'</code>) and broadcast so any interested code can react.</dd>
+
+      <dt>Array</dt>
+      <dd>An ordered list, written with square brackets: <code>[1, 2, 3]</code>.</dd>
+
+      <dt>Object</dt>
+      <dd>A bundle of labelled values, written with curly braces: <code>{ name: 'Pizza', amount: 900 }</code>.</dd>
+
+      <dt>const</dt>
+      <dd>Declares a value that never changes.</dd>
+
+      <dt>Arrow function</dt>
+      <dd>A shorthand for writing a function: <code>(x) =&gt; x * 2</code>.</dd>
+
+      <dt>Template literal</dt>
+      <dd>A string in backticks with <code>${…}</code> placeholders that are filled in with values.</dd>
+
+      <dt>Spread (<code>...</code>)</dt>
+      <dd>Unpacks a list or object into another. <code>[...list, newItem]</code> makes a new list containing everything plus the new item.</dd>
+
+      <dt>map / filter / reduce / forEach</dt>
+      <dd>The four array methods the app leans on. <em>map</em> transforms each item into a new one. <em>filter</em> keeps only items that match. <em>reduce</em> boils a list down to one value (a total, for instance). <em>forEach</em> just runs code on each item without returning anything.</dd>
+
+      <dt>Chart.js</dt>
+      <dd>A small charting library loaded from a CDN on the Reports page. It draws the pie chart and the bar chart.</dd>
+
+      <dt>CDN</dt>
+      <dd>Content Delivery Network. A public server that hosts libraries (like Chart.js) so pages can load them without shipping their own copy.</dd>
+    </dl>
+  </section>
+
+  <hr class="rule">
+
+  <section style="margin-top: 3rem;">
+    <div class="sec-brow">Fin</div>
+    <h2>That's the whole app.</h2>
+    <p>One list in <code>localStorage</code>. Five pages that read it. Two small functions in <code>balance.js</code> that turn the list into an answer. Everything else is arrangement.</p>
+    <p style="color: var(--muted); font-size: 0.9rem;">Source: <a href="https://github.com/uvabd17/rahul_varun">github.com/uvabd17/rahul_varun</a></p>
+  </section>
+
+</div>
+</body>
+</html>
