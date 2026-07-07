@@ -1,28 +1,22 @@
-const MEMBERS = ['Alice', 'Bob', 'Charlie', 'David', 'Emma'];
+/* Small pure helpers used across the app: category lookups, number and
+ * date formatting, HTML escaping, and URL query parsing. */
 
-const CATEGORIES = [
-  { name: 'Food',          icon: '🍕', color: '#f97316' },
-  { name: 'Travel',        icon: '🚖', color: '#3b82f6' },
-  { name: 'Shopping',      icon: '🛍️', color: '#ec4899' },
-  { name: 'Entertainment', icon: '🎬', color: '#8b5cf6' },
-  { name: 'Bills',         icon: '💡', color: '#10b981' },
-  { name: 'Others',        icon: '📦', color: '#6b7280' }
-];
-
-const CATEGORY_NAMES = CATEGORIES.map(c => c.name);
-
-const getCategoryInfo = (name) =>
+// Look up the full category record by name.  Falls back to the last entry
+// (Others) if a category is missing so the UI never crashes on stray data.
+const getCategoryInfo  = (name) =>
   CATEGORIES.find(c => c.name === name) || CATEGORIES[CATEGORIES.length - 1];
 
 const getCategoryIcon  = (name) => getCategoryInfo(name).icon;
 const getCategoryColor = (name) => getCategoryInfo(name).color;
 
+// Money formatter using Indian numbering ("1,00,000") with the rupee prefix.
 const formatMoney = (n) =>
   '₹' + Number(n || 0).toLocaleString('en-IN', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2
   });
 
+// Human-friendly date ("6 Jul 2026") from an ISO YYYY-MM-DD string.
 const formatDate = (iso) => {
   if (!iso) return '';
   const d = new Date(iso);
@@ -30,6 +24,7 @@ const formatDate = (iso) => {
   return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
+// Today in YYYY-MM-DD, suitable for prefilling <input type="date">.
 const todayISO = () => {
   const d = new Date();
   const yyyy = d.getFullYear();
@@ -38,6 +33,8 @@ const todayISO = () => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+// Escape user-supplied strings before dropping them into innerHTML to
+// prevent HTML/script injection from expense names or member labels.
 const escapeHtml = (s) => String(s ?? '')
   .replaceAll('&', '&amp;')
   .replaceAll('<', '&lt;')

@@ -1,21 +1,83 @@
-/* -------- Add / Edit Form -------- */
+/* Powers both the Add/Edit form (add-expense.html) and the Expenses table
+ * (display-expenses.html).  Each init routine bails early if the page's
+ * root element isn't present, so both routines can be loaded on both
+ * pages without stepping on each other. */
+
+/* ==================================================================== */
+/*                        Add / Edit Expense form                       */
+/* ==================================================================== */
 
 const initAddExpensePage = () => {
   const form = document.getElementById('expense-form');
   if (!form) return;
 
-  const paidBySelect   = document.getElementById('paidBy');
-  const categorySelect = document.getElementById('category');
-  const membersDiv     = document.getElementById('members');
-  const dateInput      = document.getElementById('date');
-  const nameInput      = document.getElementById('name');
-  const amountInput    = document.getElementById('amount');
-  const formTitle      = document.getElementById('form-title');
-  const submitBtn      = document.getElementById('submit-btn');
+  // Cache every field the form uses once; avoids repeated DOM queries on
+  // every keystroke or submit.
+  const els = {
+    name:      document.getElementById('name'),
+    amount:    document.getElementById('amount'),
+    paidBy:    document.getElementById('paidBy'),
+    category:  document.getElementById('category'),
+    date:      document.getElementById('date'),
+    members:   document.getElementById('members'),
+    formTitle: document.getElementById('form-title'),
+    submitBtn: document.getElementById('submit-btn'),
+    sampleBtn: document.getElementById('sample-btn'),
+    cancelBtn: document.getElementById('cancel-edit-btn'),
+    resetBtn:  document.getElementById('reset-btn')
+  };
 
+  populateFormOptions(els);
+  els.date.value = todayISO();
+
+  // Edit mode is triggered by `?edit=<id>` in the URL; prefill the form.
+  const editIdRaw = getQueryParam('edit');
+  const editing = editIdRaw ? getExpenseById(Number(editIdRaw)) : null;
+  if (editing) enterEditMode(els, editing);
+
+  // Auto-tick the payer whenever the "Paid By" dropdown changes so the
+  // validation rule "payer must be in sharedBy" is satisfied by default.
+  els.paidBy.addEventListener('change', () => {
+    const cb = els.members.querySelector(`input[value="${els.paidBy.value}"]`);
+    if (cb) cb.checked = true;
+    clearError('paidBy');
+    clearError('shared');
+  });
+
+  // Clear per-field errors as the user types/edits the offending input.
+  ['name', 'amount', 'category', 'date'].forEach(field => {
+    document.getElementById(field).addEventListener('input', () => clearError(field));
+  });
+  els.members.addEventListener('change', () => clearError('shared'));
+
+  form.addEventListener('submit', (e) => handleSubmit(e, els, editing));
+
+  els.sampleBtn?.addEventListener('click', () => {
+    if (confirm(MESSAGES.confirmLoadSample)) {
+      loadSampleData();
+      showToast(MESSAGES.toastAdded);
+    }
+  });
+
+  els.cancelBtn?.addEventListener('click', () => {
+    window.location.href = 'display-expenses.html';
+  });
+
+  els.resetBtn?.addEventListener('click', () => {
+    // The reset event fires before the DOM values actually clear, so we
+    // defer restoring the default date + wiping errors to the next tick.
+    setTimeout(() => {
+      els.date.value = todayISO();
+      clearAllErrors();
+    }, 0);
+  });
+};
+
+// Fill Paid By, Category, and Members Shared from the constants.
+const populateFormOptions = ({ paidBy, category, members }) => {
   MEMBERS.forEach(m => {
-    paidBySelect.insertAdjacentHTML('beforeend', `<option value="${m}">${m}</option>`);
-    membersDiv.insertAdjacentHTML('beforeend', `
+    paidBy.insertAdjacentHTML('beforeend', `<option value="${m}">${m}</option>`);
+    members.insertAdjacentHTML('beforeend', `
       <label class="checkbox-chip">
         <input type="checkbox" name="shared" value="${m}"> ${m}
       </label>
@@ -23,228 +85,208 @@ const initAddExpensePage = () => {
   });
 
   CATEGORIES.forEach(c => {
-    categorySelect.insertAdjacentHTML('beforeend',
+    category.insertAdjacentHTML('beforeend',
       `<option value="${c.name}">${c.icon} ${c.name}</option>`);
   });
+};
 
-  dateInput.value = todayISO();
-
-  // ?edit=<id> prefills the form and switches to update mode
-  const editIdRaw = getQueryParam('edit');
-  const editId = editIdRaw ? Number(editIdRaw) : null;
-  const editing = editId ? getExpenseById(editId) : null;
-
-  if (editing) {
-    formTitle.textContent = 'Edit Expense';
-    submitBtn.textContent = 'Save Changes';
-    nameInput.value       = editing.expense;
-    amountInput.value     = editing.amount;
-    paidBySelect.value    = editing.paidBy;
-    categorySelect.value  = editing.category;
-    dateInput.value       = editing.date;
-    editing.sharedBy.forEach(m => {
-      const cb = membersDiv.querySelector(`input[value="${m}"]`);
-      if (cb) cb.checked = true;
-    });
-  }
-
-  // payer should always be part of sharedBy — auto-tick their checkbox
-  paidBySelect.addEventListener('change', () => {
-    const cb = membersDiv.querySelector(`input[value="${paidBySelect.value}"]`);
+// Prefill the form with an existing expense and switch button labels.
+const enterEditMode = (els, expense) => {
+  els.formTitle.textContent = 'Edit Expense';
+  els.submitBtn.textContent = 'Save Changes';
+  els.name.value     = expense.name;
+  els.amount.value   = expense.amount;
+  els.paidBy.value   = expense.paidBy;
+  els.category.value = expense.category;
+  els.date.value     = expense.date;
+  expense.sharedBy.forEach(m => {
+    const cb = els.members.querySelector(`input[value="${m}"]`);
     if (cb) cb.checked = true;
-    clearError('paidBy');
-    clearError('shared');
   });
+  els.cancelBtn.classList.remove('is-hidden');
+  els.sampleBtn.classList.add('is-hidden');
+};
 
-  ['name', 'amount', 'category', 'date'].forEach(field => {
-    document.getElementById(field).addEventListener('input', () => clearError(field));
-  });
-  membersDiv.addEventListener('change', () => clearError('shared'));
+// Validate, then either add or update depending on edit mode.
+const handleSubmit = (event, els, editing) => {
+  event.preventDefault();
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+  const payload = {
+    name:     els.name.value.trim(),
+    amount:   parseFloat(els.amount.value),
+    paidBy:   els.paidBy.value,
+    category: els.category.value,
+    date:     els.date.value,
+    sharedBy: [...document.querySelectorAll('input[name="shared"]:checked')]
+                .map(el => el.value)
+  };
 
-    const name        = nameInput.value.trim();
-    const amount      = parseFloat(amountInput.value);
-    const paidBy      = paidBySelect.value;
-    const category    = categorySelect.value;
-    const date        = dateInput.value;
-    const sharedBy    = [...document.querySelectorAll('input[name="shared"]:checked')]
-                          .map(el => el.value);
-
-    let ok = true;
-    if (!name)                       { showError('name', 'Expense name is required.'); ok = false; }
-    if (!amount || amount <= 0)      { showError('amount', 'Amount must be greater than zero.'); ok = false; }
-    if (!paidBy)                     { showError('paidBy', 'Please select who paid.'); ok = false; }
-    if (!category)                   { showError('category', 'Please select a category.'); ok = false; }
-    if (!date)                       { showError('date', 'Please pick a date.'); ok = false; }
-    if (sharedBy.length === 0)       { showError('shared', 'Select at least one member.'); ok = false; }
-    if (paidBy && !sharedBy.includes(paidBy)) {
-      showError('shared', 'The payer must also be one of the selected members.');
-      ok = false;
-    }
-    if (!ok) return;
-
-    const payload = { expense: name, amount, paidBy, category, sharedBy, date };
-
-    if (editing) {
-      updateExpense(editing.id, payload);
-      window.location.href = 'display-expenses.html';
-    } else {
-      addExpense(payload);
-      form.reset();
-      dateInput.value = todayISO();
-      showToast('Expense added successfully.');
-    }
-  });
-
-  document.getElementById('reset-btn')?.addEventListener('click', () => {
-    setTimeout(() => {
-      dateInput.value = todayISO();
-      clearAllErrors();
-    }, 0);
-  });
-
-  document.getElementById('sample-btn')?.addEventListener('click', () => {
-    if (confirm('Load 6 sample expenses into your dashboard?')) {
-      loadSampleData();
-      showToast('Sample data loaded.');
-    }
-  });
-
-  document.getElementById('cancel-edit-btn')?.addEventListener('click', () => {
-    window.location.href = 'display-expenses.html';
-  });
+  if (!validateExpense(payload)) return;
 
   if (editing) {
-    document.getElementById('cancel-edit-btn').style.display = 'inline-flex';
-    document.getElementById('sample-btn').style.display = 'none';
+    updateExpense(editing.id, payload);
+    window.location.href = 'display-expenses.html';
+  } else {
+    addExpense(payload);
+    document.getElementById('expense-form').reset();
+    els.date.value = todayISO();
+    showToast(MESSAGES.toastAdded);
   }
 };
 
-/* -------- Display Expenses -------- */
+// Run every validation rule.  Errors surface inline under each field.
+// Returns true only if every rule passes.
+const validateExpense = ({ name, amount, paidBy, category, date, sharedBy }) => {
+  let ok = true;
+  if (!name)                                { showError('name',     MESSAGES.errNameRequired);     ok = false; }
+  if (!amount || amount <= 0)               { showError('amount',   MESSAGES.errAmountRequired);   ok = false; }
+  if (!paidBy)                              { showError('paidBy',   MESSAGES.errPaidByRequired);   ok = false; }
+  if (!category)                            { showError('category', MESSAGES.errCategoryRequired); ok = false; }
+  if (!date)                                { showError('date',     MESSAGES.errDateRequired);     ok = false; }
+  if (sharedBy.length === 0)                { showError('shared',   MESSAGES.errAtLeastOneMember); ok = false; }
+  if (paidBy && !sharedBy.includes(paidBy)) { showError('shared',   MESSAGES.errPayerNotInShared); ok = false; }
+  return ok;
+};
+
+/* ==================================================================== */
+/*                         Display Expenses table                       */
+/* ==================================================================== */
 
 const initDisplayExpensesPage = () => {
   const tableWrap = document.getElementById('expenses-table');
   if (!tableWrap) return;
 
-  const searchInput = document.getElementById('search-input');
-  const catFilter   = document.getElementById('cat-filter');
-  const sortSelect  = document.getElementById('sort-select');
+  const els = {
+    search:    document.getElementById('search-input'),
+    catFilter: document.getElementById('cat-filter'),
+    sort:      document.getElementById('sort-select'),
+    sampleBtn: document.getElementById('sample-btn'),
+    clearBtn:  document.getElementById('clear-btn')
+  };
 
+  // Populate Category filter dropdown.
   CATEGORIES.forEach(c => {
-    catFilter.insertAdjacentHTML('beforeend',
+    els.catFilter.insertAdjacentHTML('beforeend',
       `<option value="${c.name}">${c.icon} ${c.name}</option>`);
   });
 
-  const state = { q: '', cat: '', sort: 'date-desc' };
+  // Populate the Sort dropdown from the constant.
+  els.sort.innerHTML = SORT_OPTIONS
+    .map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+  els.sort.value = DEFAULT_SORT;
 
-  const applyFilters = (list) => {
-    let out = [...list];
-    if (state.q) {
-      const q = state.q.toLowerCase();
-      out = out.filter(e => e.expense.toLowerCase().includes(q));
-    }
-    if (state.cat) out = out.filter(e => e.category === state.cat);
+  const state = { q: '', cat: '', sort: DEFAULT_SORT };
+  const render = () => renderExpensesTable(tableWrap, applyFilters(loadExpenses(), state));
 
-    const cmp = {
-      'date-desc':   (a, b) => (b.date || '').localeCompare(a.date || ''),
-      'date-asc':    (a, b) => (a.date || '').localeCompare(b.date || ''),
-      'amount-desc': (a, b) => Number(b.amount) - Number(a.amount),
-      'amount-asc':  (a, b) => Number(a.amount) - Number(b.amount)
-    }[state.sort];
-    if (cmp) out.sort(cmp);
-    return out;
-  };
+  els.search   .addEventListener('input',  () => { state.q    = els.search.value.trim(); render(); });
+  els.catFilter.addEventListener('change', () => { state.cat  = els.catFilter.value;     render(); });
+  els.sort     .addEventListener('change', () => { state.sort = els.sort.value;          render(); });
 
-  const render = () => {
-    const list = applyFilters(loadExpenses());
+  els.sampleBtn?.addEventListener('click', () => {
+    if (confirm(MESSAGES.confirmLoadSample)) loadSampleData();
+  });
 
-    if (list.length === 0) {
-      const hasData = loadExpenses().length > 0;
-      tableWrap.innerHTML = hasData
-        ? `<p class="empty">No expenses match your filters.</p>`
-        : `<div class="empty-state">
-             <span class="icon">🧾</span>
-             <h3>No expenses yet</h3>
-             <p>Add your first shared expense to start tracking who owes whom.</p>
-             <a class="btn" href="add-expense.html">Add Expense</a>
-           </div>`;
-      return;
-    }
+  els.clearBtn?.addEventListener('click', () => {
+    if (confirm(MESSAGES.confirmClearAll)) clearAllExpenses();
+  });
 
-    const rows = list.map(e => {
-      const share = Number(e.amount) / e.sharedBy.length;
-      const info = getCategoryInfo(e.category);
-      return `
-        <tr>
-          <td data-label="Expense">${escapeHtml(e.expense)}</td>
-          <td data-label="Amount">${formatMoney(e.amount)}</td>
-          <td data-label="Paid By">${escapeHtml(e.paidBy)}</td>
-          <td data-label="Category">
-            <span class="tag" style="background:${info.color}22;color:${info.color}">
-              ${info.icon} ${info.name}
-            </span>
-          </td>
-          <td data-label="Shared By">${e.sharedBy.map(escapeHtml).join(', ')}</td>
-          <td data-label="Split">${formatMoney(share)} each</td>
-          <td data-label="Date">${formatDate(e.date)}</td>
-          <td data-label="Actions" class="actions-cell">
-            <a class="btn-sm btn-edit" href="add-expense.html?edit=${e.id}">Edit</a>
-            <button class="btn-sm btn-delete" data-id="${e.id}">Delete</button>
-          </td>
-        </tr>
-      `;
-    }).join('');
-
-    tableWrap.innerHTML = `
-      <div class="table-scroll">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Expense</th><th>Amount</th><th>Paid By</th><th>Category</th>
-              <th>Shared By</th><th>Split</th><th>Date</th><th></th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    `;
-
-    tableWrap.querySelectorAll('.btn-delete').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (confirm('Delete this expense? This cannot be undone.')) {
-          deleteExpense(Number(btn.dataset.id));
-        }
-      });
-    });
-  };
-
-  searchInput.addEventListener('input', () => { state.q   = searchInput.value.trim(); render(); });
-  catFilter  .addEventListener('change', () => { state.cat = catFilter.value;         render(); });
-  sortSelect .addEventListener('change', () => { state.sort = sortSelect.value;       render(); });
-
-  document.getElementById('sample-btn')?.addEventListener('click', () => {
-    if (confirm('Load 6 sample expenses into your dashboard?')) {
-      loadSampleData();
+  // Wire delete via event delegation so a single listener survives every
+  // re-render of the table body.
+  tableWrap.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-delete');
+    if (!btn) return;
+    if (confirm(MESSAGES.confirmDeleteExpense)) {
+      deleteExpense(Number(btn.dataset.id));
     }
   });
 
-  document.getElementById('clear-btn')?.addEventListener('click', () => {
-    if (confirm('Delete ALL expenses? This cannot be undone.')) {
-      clearAllExpenses();
-    }
-  });
-
-  window.addEventListener('expenses-updated', render);
+  window.addEventListener(EVENT_EXPENSES_UPDATED, render);
   render();
 };
 
-/* -------- error + toast helpers -------- */
+// Apply search, category, and sort filters to a list of expenses.
+const applyFilters = (list, { q, cat, sort }) => {
+  let out = [...list];
+  if (q)   out = out.filter(e => (e.paidBy || '').toLowerCase().includes(q.toLowerCase()));
+  if (cat) out = out.filter(e => e.category === cat);
 
-const showError = (field, msg) => {
+  const comparators = {
+    'date-desc':   (a, b) => (b.date || '').localeCompare(a.date || ''),
+    'date-asc':    (a, b) => (a.date || '').localeCompare(b.date || ''),
+    'amount-desc': (a, b) => Number(b.amount) - Number(a.amount),
+    'amount-asc':  (a, b) => Number(a.amount) - Number(b.amount)
+  };
+  const cmp = comparators[sort];
+  if (cmp) out.sort(cmp);
+  return out;
+};
+
+const renderExpensesTable = (container, list) => {
+  if (list.length === 0) {
+    // Different empty state depending on whether the filters hid
+    // everything or the dashboard is genuinely empty.
+    container.innerHTML = loadExpenses().length > 0 ? emptyMatch() : emptyDashboard();
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Expense</th><th>Amount</th><th>Paid By</th><th>Category</th>
+            <th>Shared By</th><th>Split</th><th>Date</th><th></th>
+          </tr>
+        </thead>
+        <tbody>${list.map(expenseRow).join('')}</tbody>
+      </table>
+    </div>
+  `;
+};
+
+const expenseRow = (e) => {
+  const share = Number(e.amount) / e.sharedBy.length;
+  const info = getCategoryInfo(e.category);
+  return `
+    <tr>
+      <td data-label="Expense">${escapeHtml(e.name)}</td>
+      <td data-label="Amount">${formatMoney(e.amount)}</td>
+      <td data-label="Paid By">${escapeHtml(e.paidBy)}</td>
+      <td data-label="Category">
+        <span class="tag" style="background:${info.color}22;color:${info.color}">
+          ${info.icon} ${info.name}
+        </span>
+      </td>
+      <td data-label="Shared By">${e.sharedBy.map(escapeHtml).join(', ')}</td>
+      <td data-label="Split">${formatMoney(share)} each</td>
+      <td data-label="Date">${formatDate(e.date)}</td>
+      <td data-label="Actions" class="actions-cell">
+        <a class="btn-sm btn-edit" href="add-expense.html?edit=${e.id}">Edit</a>
+        <button class="btn-sm btn-delete" data-id="${e.id}">Delete</button>
+      </td>
+    </tr>
+  `;
+};
+
+const emptyDashboard = () => `
+  <div class="empty-state">
+    <span class="icon">🧾</span>
+    <h3>${MESSAGES.emptyNoExpensesTitle}</h3>
+    <p>${MESSAGES.emptyNoExpensesBody}</p>
+    <a class="btn" href="add-expense.html">Add Expense</a>
+  </div>
+`;
+
+const emptyMatch = () => `<p class="empty">${MESSAGES.emptyNoMatch}</p>`;
+
+/* ==================================================================== */
+/*                         Error + toast helpers                        */
+/* ==================================================================== */
+
+// Show an inline error under a form field.
+const showError = (field, message) => {
   const el = document.getElementById(`err-${field}`);
-  if (el) { el.textContent = msg; el.hidden = false; }
+  if (el) { el.textContent = message; el.hidden = false; }
 };
 
 const clearError = (field) => {
@@ -255,7 +297,8 @@ const clearError = (field) => {
 const clearAllErrors = () =>
   document.querySelectorAll('.field-error').forEach(el => { el.textContent = ''; el.hidden = true; });
 
-const showToast = (msg) => {
+// Create the toast element on first use and reuse it thereafter.
+const showToast = (message) => {
   let toast = document.getElementById('toast');
   if (!toast) {
     toast = document.createElement('div');
@@ -263,9 +306,9 @@ const showToast = (msg) => {
     toast.className = 'toast';
     document.body.appendChild(toast);
   }
-  toast.textContent = msg;
+  toast.textContent = message;
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2200);
+  setTimeout(() => toast.classList.remove('show'), TOAST_DURATION_MS);
 };
 
 document.addEventListener('DOMContentLoaded', () => {

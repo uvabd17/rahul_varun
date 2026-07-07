@@ -1,25 +1,31 @@
-const STORAGE_KEY = 'expenses';
+/* Read/write helpers for the expenses list persisted in localStorage.
+ * Every mutating helper fires EVENT_EXPENSES_UPDATED so any open page can
+ * re-render itself against the fresh list. */
 
 const loadExpenses = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
+    // Corrupted JSON in storage should degrade to an empty list, not throw
+    // and break the whole page.
     return [];
   }
 };
 
 const saveExpenses = (list) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  window.dispatchEvent(new CustomEvent('expenses-updated'));
+  window.dispatchEvent(new CustomEvent(EVENT_EXPENSES_UPDATED));
 };
 
 const getExpenseById = (id) => loadExpenses().find(e => e.id === id) || null;
 
-const addExpense = (obj) => {
+const addExpense = (expense) => {
   const list = loadExpenses();
+  // Random tail on top of the timestamp keeps two expenses added in the
+  // same millisecond from ending up with identical ids.
   const id = Date.now() + Math.floor(Math.random() * 1000);
-  list.push({ id, ...obj });
+  list.push({ id, ...expense });
   saveExpenses(list);
   return id;
 };
@@ -36,19 +42,13 @@ const deleteExpense = (id) => {
 
 const clearAllExpenses = () => saveExpenses([]);
 
+// Seed the six sample expenses, timestamping each with today's date so the
+// dashboard shows something the moment a fresh user clicks "Load Sample".
 const loadSampleData = () => {
   const today = todayISO();
-  const samples = [
-    { expense: 'Pizza',   amount: 900,  paidBy: 'Alice',   category: 'Food',          sharedBy: ['Alice', 'Bob', 'Charlie'],          date: today },
-    { expense: 'Biryani', amount: 1200, paidBy: 'Bob',     category: 'Food',          sharedBy: ['Alice', 'Bob', 'Charlie', 'David'], date: today },
-    { expense: 'Burger',  amount: 500,  paidBy: 'Charlie', category: 'Food',          sharedBy: ['Bob', 'Charlie'],                   date: today },
-    { expense: 'Movie',   amount: 600,  paidBy: 'Bob',     category: 'Entertainment', sharedBy: ['Bob', 'Charlie'],                   date: today },
-    { expense: 'Taxi',    amount: 400,  paidBy: 'David',   category: 'Travel',        sharedBy: ['David', 'Emma'],                    date: today },
-    { expense: 'Bus',     amount: 300,  paidBy: 'Emma',    category: 'Travel',        sharedBy: ['David', 'Emma'],                    date: today }
-  ];
   const list = loadExpenses();
-  samples.forEach((s, i) => {
-    list.push({ id: Date.now() + i, ...s });
+  SAMPLE_EXPENSES.forEach((s, i) => {
+    list.push({ id: Date.now() + i, ...s, date: today });
   });
   saveExpenses(list);
 };

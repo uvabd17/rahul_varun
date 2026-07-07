@@ -1,10 +1,4 @@
-const NAV_ITEMS = [
-  { key: 'add',     href: 'add-expense.html',       label: 'Add Expense', icon: '➕' },
-  { key: 'display', href: 'display-expenses.html',  label: 'Expenses',    icon: '📋' },
-  { key: 'split',   href: 'split-calculation.html', label: 'Split',       icon: '🧮' },
-  { key: 'balance', href: 'balance-summary.html',   label: 'Balances',    icon: '⚖️' },
-  { key: 'reports', href: 'reports.html',           label: 'Reports',     icon: '📊' }
-];
+/* Shared top-bar rendered on every page + cross-tab data sync bridge. */
 
 const mountNav = (active) => {
   const header = document.createElement('header');
@@ -36,14 +30,16 @@ const mountNav = (active) => {
   const menu   = header.querySelector('.nav-menu');
   toggle.addEventListener('click', () => menu.classList.toggle('open'));
 
+  // Auto-close the mobile menu once the user follows a link.
   menu.querySelectorAll('a').forEach(a => {
     a.addEventListener('click', () => menu.classList.remove('open'));
   });
 };
 
-// forward cross-tab storage events into our in-page event
+// Forward cross-tab localStorage changes into the in-page event so pages
+// only need to listen to one thing regardless of which tab did the write.
 window.addEventListener('storage', (e) => {
   if (e.key === STORAGE_KEY) {
-    window.dispatchEvent(new CustomEvent('expenses-updated'));
+    window.dispatchEvent(new CustomEvent(EVENT_EXPENSES_UPDATED));
   }
 });

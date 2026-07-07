@@ -593,3 +593,28 @@ input:focus-visible, select:focus-visible { outline: none; }
   box-shadow: var(--shadow-lg);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ==== Utility classes replacing former inline styles ==== */
+
+/* Label above a group of controls inside a form (e.g. "Members Shared"). */
+.form-section-label {
+  font-size: 0.9rem;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+/* Field error that spans its own row rather than sitting inline. */
+.field-error--block {
+  margin-top: 0.5rem;
+}
+.field-error--block:not([hidden]) { display: block; }
+
+/* Generic hide utility used to toggle buttons like Cancel Edit. */
+.is-hidden { display: none; }
+
+/* Decorative icon inside the Reports page stat-hero. */
+.stat-hero-icon {
+  font-size: 3rem;
+  opacity: 0.5;
+}
