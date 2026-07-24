@@ -1,0 +1,21 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-server
+  profiles:
+    active: dev
+
+# Standalone registry — it does not register with itself, does not fetch a peer list.
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  server:
+    # Faster eviction during dev so restarts feel snappy.
+    eviction-interval-timer-in-ms: 15000
