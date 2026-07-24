@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connections — LinkedIn Lite</title>
+  <link rel="stylesheet" href="/shared/styles/tokens.css">
+  <link rel="stylesheet" href="/connection-mf/css/style.css">
+  <link rel="stylesheet" href="/connection-mf/css/responsive.css">
+</head>
+<body>
+
+  <section class="cn-page">
+
+    <header class="cn-toolbar">
+      <div class="cn-tabs" role="tablist">
+        <button class="cn-tab" type="button" data-action="tab" data-tab="find"   role="tab">Find people</button>
+        <button class="cn-tab" type="button" data-action="tab" data-tab="pending" role="tab">
+          Requests <span class="cn-badge" data-hook="pending-count" hidden></span>
+        </button>
+        <button class="cn-tab" type="button" data-action="tab" data-tab="connections" role="tab">Connections</button>
+      </div>
+    </header>
+
+    <!-- ===== Find people ===== -->
+    <section class="cn-panel" data-panel="find">
+      <input class="cn-search" type="search" placeholder="Search by name or email" data-hook="search">
+      <div class="cn-list" data-hook="find-list">
+        <div class="cn-empty">Type a name to find someone.</div>
+      </div>
+    </section>
+
+    <!-- ===== Pending ===== -->
+    <section class="cn-panel" data-panel="pending" hidden>
+      <div class="cn-list" data-hook="pending-list">
+        <div class="cn-empty">Loading…</div>
+      </div>
+    </section>
+
+    <!-- ===== Connections ===== -->
+    <section class="cn-panel" data-panel="connections" hidden>
+      <div class="cn-list" data-hook="connections-list">
+        <div class="cn-empty">Loading…</div>
+      </div>
+    </section>
+  </section>
+
+  <script src="/connection-mf/js/constants.js"></script>
+  <script src="/connection-mf/js/utils.js"></script>
+  <script src="/connection-mf/js/api.js"></script>
+  <script src="/connection-mf/js/events.js"></script>
+  <script src="/connection-mf/js/app.js"></script>
+</body>
+</html>

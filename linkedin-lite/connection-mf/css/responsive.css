@@ -1,0 +1,4 @@
+@media (max-width: 640px) {
+  .cn-row            { grid-template-columns: 36px 1fr; }
+  .cn-row__actions   { grid-column: 1 / -1; justify-content: flex-end; }
+}
