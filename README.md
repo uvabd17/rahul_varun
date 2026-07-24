@@ -48,6 +48,12 @@ mvn -pl api-gateway   spring-boot:run   # terminal 2
 mvn -pl user-service  spring-boot:run   # terminal 3
 ```
 
+No MySQL? Boot `user-service` with the in-memory H2 profile — same schema, data resets on restart:
+
+```bash
+mvn -pl user-service spring-boot:run -Dspring-boot.run.profiles=h2
+```
+
 **3. Frontend** (from `linkedin-lite/`)
 
 ```bash
@@ -67,8 +73,8 @@ Open `http://localhost:3000/shell-app/`.
 | # | Name           | Frontend        | Backend             | Status |
 | - | -------------- | --------------- | ------------------- | ------ |
 | 1 | Auth & User    | `auth-mf`       | `user-service`      | ✅ done |
-| 2 | Profile        | `profile-mf`    | `user-service`      | ⏳ next |
-| 3 | Posts          | `post-mf`       | `post-service`      | ⏳     |
+| 2 | Profile        | `profile-mf`    | `user-service`      | ✅ done |
+| 3 | Posts          | `post-mf`       | `post-service`      | ⏳ next |
 | 4 | Connections    | `connection-mf` | `connection-service`| ⏳     |
 | 5 | Jobs           | `job-mf`        | `job-service`       | ⏳     |
 
