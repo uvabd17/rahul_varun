@@ -38,13 +38,14 @@ public class Profile {
     @Column(name = "profile_picture_url", length = 500)
     private String profilePictureUrl;
 
-    // JSON columns — Module 2 will manage the shape via mapper helpers.
-    @Column(columnDefinition = "JSON")
+    // JSON-encoded string. TEXT keeps the column portable across MySQL/H2 —
+    // ProfileMapper handles the (de)serialisation via Jackson.
+    @Column(columnDefinition = "TEXT")
     private String skills;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String education;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String experience;
 }
