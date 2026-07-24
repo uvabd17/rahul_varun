@@ -19,6 +19,18 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/users/**,/profile/**
+        - id: post-service
+          uri: lb://post-service
+          predicates:
+            - Path=/posts/**
+        - id: connection-service
+          uri: lb://connection-service
+          predicates:
+            - Path=/connections/**
+        - id: job-service
+          uri: lb://job-service
+          predicates:
+            - Path=/jobs/**
       # Global CORS — frontend runs on :3000 during dev.
       globalcors:
         cors-configurations:

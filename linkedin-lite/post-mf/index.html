@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feed — LinkedIn Lite</title>
+  <link rel="stylesheet" href="/shared/styles/tokens.css">
+  <link rel="stylesheet" href="/post-mf/css/style.css">
+  <link rel="stylesheet" href="/post-mf/css/responsive.css">
+</head>
+<body>
+
+  <section class="pm-page">
+
+    <header class="pm-toolbar">
+      <div class="pm-tabs" role="tablist">
+        <button class="pm-tab" type="button" data-action="tab" data-tab="feed"  role="tab">Feed</button>
+        <button class="pm-tab" type="button" data-action="tab" data-tab="mine"  role="tab">My posts</button>
+      </div>
+      <input class="pm-search" type="search" placeholder="Search posts…" data-hook="search">
+    </header>
+
+    <!-- ===== Create card ===== -->
+    <article class="pm-compose">
+      <form class="pm-compose__form" data-form="create" novalidate>
+        <textarea class="pm-compose__input" name="content" rows="2" maxlength="3000"
+                  placeholder="Share an update…"></textarea>
+        <div class="pm-compose__row">
+          <input class="pm-compose__url" type="url" name="imageUrl" maxlength="500"
+                 placeholder="Optional image URL">
+          <button class="pm-button" type="submit">Post</button>
+        </div>
+      </form>
+    </article>
+
+    <!-- ===== Feed list ===== -->
+    <div class="pm-feed" data-hook="feed">
+      <div class="pm-empty">Loading…</div>
+    </div>
+  </section>
+
+  <script src="/post-mf/js/constants.js"></script>
+  <script src="/post-mf/js/utils.js"></script>
+  <script src="/post-mf/js/validation.js"></script>
+  <script src="/post-mf/js/api.js"></script>
+  <script src="/post-mf/js/events.js"></script>
+  <script src="/post-mf/js/app.js"></script>
+</body>
+</html>

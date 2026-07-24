@@ -8,10 +8,13 @@
     SESSION_KEY: 'll.session',
 
     ROUTES: Object.freeze({
-      LOGIN:    '#/login',
-      REGISTER: '#/register',
-      HOME:     '#/home',
-      PROFILE:  '#/profile',
+      LOGIN:       '#/login',
+      REGISTER:    '#/register',
+      HOME:        '#/home',
+      PROFILE:     '#/profile',
+      FEED:        '#/feed',
+      CONNECTIONS: '#/connections',
+      JOBS:        '#/jobs',
     }),
 
     EVENTS: Object.freeze({

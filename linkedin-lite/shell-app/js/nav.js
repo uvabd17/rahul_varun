@@ -35,8 +35,11 @@
   function renderAuthed(session) {
     const frag = document.createDocumentFragment();
 
-    frag.appendChild(anchor('Home',    ROUTES.HOME,    'site-nav__link'));
-    frag.appendChild(anchor('Profile', ROUTES.PROFILE, 'site-nav__link'));
+    frag.appendChild(anchor('Home',        ROUTES.HOME,        'site-nav__link'));
+    frag.appendChild(anchor('Feed',        ROUTES.FEED,        'site-nav__link'));
+    frag.appendChild(anchor('Connections', ROUTES.CONNECTIONS, 'site-nav__link'));
+    frag.appendChild(anchor('Jobs',        ROUTES.JOBS,        'site-nav__link'));
+    frag.appendChild(anchor('Profile',     ROUTES.PROFILE,     'site-nav__link'));
 
     const badge = document.createElement('span');
     badge.className = 'site-nav__user';

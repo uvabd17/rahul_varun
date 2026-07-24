@@ -16,6 +16,18 @@
       routes:   [ROUTES.PROFILE],
       htmlPath: '/profile-mf/index.html',
     },
+    'post-mf': {
+      routes:   [ROUTES.FEED],
+      htmlPath: '/post-mf/index.html',
+    },
+    'connection-mf': {
+      routes:   [ROUTES.CONNECTIONS],
+      htmlPath: '/connection-mf/index.html',
+    },
+    'job-mf': {
+      routes:   [ROUTES.JOBS],
+      htmlPath: '/job-mf/index.html',
+    },
   });
 
   global.ShellConstants = Object.freeze({
