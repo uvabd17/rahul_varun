@@ -1,0 +1,8 @@
+@media (max-width: 640px) {
+  .auth-card                 { padding: var(--space-5); }
+  .auth-form__row            { grid-template-columns: 1fr; }
+  .home-grid                 { grid-template-columns: 1fr; }
+  .home-admin__header        { flex-direction: column; align-items: stretch; }
+  .home-admin__search        { min-width: 0; width: 100%; }
+  .home-facts                { grid-template-columns: 100px 1fr; }
+}

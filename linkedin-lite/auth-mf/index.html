@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth — LinkedIn Lite</title>
+  <link rel="stylesheet" href="/shared/styles/tokens.css">
+  <link rel="stylesheet" href="/auth-mf/css/style.css">
+  <link rel="stylesheet" href="/auth-mf/css/responsive.css">
+</head>
+<body>
+
+  <!-- ===== Login ===== -->
+  <section class="auth-panel" data-view="login" hidden>
+    <div class="auth-card">
+      <h1 class="auth-card__title">Sign in</h1>
+      <p class="auth-card__sub">Stay updated on your professional world.</p>
+
+      <form class="auth-form" data-form="login" novalidate>
+        <label class="auth-field">
+          <span class="auth-field__label">Email</span>
+          <input class="auth-field__input" type="email" name="email" autocomplete="email" required>
+          <small class="auth-field__error" data-error-for="email"></small>
+        </label>
+
+        <label class="auth-field">
+          <span class="auth-field__label">Password</span>
+          <input class="auth-field__input" type="password" name="password" autocomplete="current-password" required>
+          <small class="auth-field__error" data-error-for="password"></small>
+        </label>
+
+        <button class="auth-button" type="submit">Sign in</button>
+      </form>
+
+      <p class="auth-swap">
+        New here?
+        <a href="#/register">Create an account</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== Register ===== -->
+  <section class="auth-panel" data-view="register" hidden>
+    <div class="auth-card">
+      <h1 class="auth-card__title">Join LinkedIn Lite</h1>
+      <p class="auth-card__sub">Make the most of your professional life.</p>
+
+      <form class="auth-form" data-form="register" novalidate>
+        <div class="auth-form__row">
+          <label class="auth-field">
+            <span class="auth-field__label">First name</span>
+            <input class="auth-field__input" type="text" name="firstName" autocomplete="given-name" required>
+            <small class="auth-field__error" data-error-for="firstName"></small>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-field__label">Last name</span>
+            <input class="auth-field__input" type="text" name="lastName" autocomplete="family-name" required>
+            <small class="auth-field__error" data-error-for="lastName"></small>
+          </label>
+        </div>
+
+        <label class="auth-field">
+          <span class="auth-field__label">Email</span>
+          <input class="auth-field__input" type="email" name="email" autocomplete="email" required>
+          <small class="auth-field__error" data-error-for="email"></small>
+        </label>
+
+        <label class="auth-field">
+          <span class="auth-field__label">Password (min 8 characters)</span>
+          <input class="auth-field__input" type="password" name="password" autocomplete="new-password" required>
+          <small class="auth-field__error" data-error-for="password"></small>
+        </label>
+
+        <label class="auth-field auth-field--inline">
+          <input type="checkbox" name="asAdmin">
+          <span>Create as admin (for demo — the seed user)</span>
+        </label>
+
+        <button class="auth-button" type="submit">Agree &amp; join</button>
+      </form>
+
+      <p class="auth-swap">
+        Already on LinkedIn Lite?
+        <a href="#/login">Sign in</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== Home (logged-in landing) ===== -->
+  <section class="auth-panel" data-view="home" hidden>
+    <div class="home-hero">
+      <h1 class="home-hero__title" data-hook="home-welcome">Welcome back</h1>
+      <p class="home-hero__sub">
+        Module 1 covers who you are and how you sign in. Profiles, posts, connections,
+        and jobs land in modules 2 – 5.
+      </p>
+    </div>
+
+    <div class="home-grid">
+      <article class="home-card">
+        <h2 class="home-card__title">You</h2>
+        <dl class="home-facts">
+          <dt>Name</dt>       <dd data-hook="fact-name"></dd>
+          <dt>Email</dt>      <dd data-hook="fact-email"></dd>
+          <dt>Role</dt>       <dd data-hook="fact-role"></dd>
+          <dt>Member since</dt><dd data-hook="fact-since"></dd>
+        </dl>
+      </article>
+
+      <article class="home-card">
+        <h2 class="home-card__title">Coming next</h2>
+        <ul class="home-list">
+          <li><strong>Module 2</strong> — Profile: headline, skills, education, experience</li>
+          <li><strong>Module 3</strong> — Posts: create, edit, feed, search</li>
+          <li><strong>Module 4</strong> — Connections: send, accept, remove</li>
+          <li><strong>Module 5</strong> — Jobs: post, filter, apply</li>
+        </ul>
+      </article>
+    </div>
+
+    <section class="home-admin" data-hook="admin-panel" hidden>
+      <div class="home-admin__header">
+        <h2 class="home-card__title">All users</h2>
+        <input class="home-admin__search" type="search" placeholder="Search by name or email"
+               data-hook="admin-search">
+      </div>
+      <div class="home-admin__table-wrap">
+        <table class="home-admin__table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody data-hook="admin-tbody">
+            <tr><td colspan="5" class="home-admin__empty">Loading users…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <script src="/auth-mf/js/constants.js"></script>
+  <script src="/auth-mf/js/utils.js"></script>
+  <script src="/auth-mf/js/validation.js"></script>
+  <script src="/auth-mf/js/api.js"></script>
+  <script src="/auth-mf/js/events.js"></script>
+  <script src="/auth-mf/js/app.js"></script>
+</body>
+</html>
