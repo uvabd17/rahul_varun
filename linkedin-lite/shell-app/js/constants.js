@@ -12,6 +12,10 @@
       routes:   [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.HOME],
       htmlPath: '/auth-mf/index.html',
     },
+    'profile-mf': {
+      routes:   [ROUTES.PROFILE],
+      htmlPath: '/profile-mf/index.html',
+    },
   });
 
   global.ShellConstants = Object.freeze({

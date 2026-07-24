@@ -35,6 +35,9 @@
   function renderAuthed(session) {
     const frag = document.createDocumentFragment();
 
+    frag.appendChild(anchor('Home',    ROUTES.HOME,    'site-nav__link'));
+    frag.appendChild(anchor('Profile', ROUTES.PROFILE, 'site-nav__link'));
+
     const badge = document.createElement('span');
     badge.className = 'site-nav__user';
     badge.textContent = `${session.user.firstName} ${session.user.lastName}`;

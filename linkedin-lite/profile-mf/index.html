@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile — LinkedIn Lite</title>
+  <link rel="stylesheet" href="/shared/styles/tokens.css">
+  <link rel="stylesheet" href="/profile-mf/css/style.css">
+  <link rel="stylesheet" href="/profile-mf/css/responsive.css">
+</head>
+<body>
+
+  <section class="profile-mf" data-hook="root">
+    <div class="profile-mf__loading" data-hook="loading">Loading your profile…</div>
+
+    <div class="profile-mf__body" data-hook="body" hidden>
+
+      <!-- ===== Header card ===== -->
+      <article class="pf-header" data-view="view">
+        <div class="pf-header__row">
+          <div class="pf-avatar" data-hook="avatar-view"></div>
+          <div class="pf-header__meta">
+            <h1 class="pf-header__name" data-hook="name-view"></h1>
+            <p class="pf-header__headline" data-hook="headline-view"></p>
+            <p class="pf-header__location" data-hook="location-view"></p>
+          </div>
+          <div class="pf-header__actions">
+            <button class="pf-button" type="button" data-action="enter-edit">Edit profile</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="pf-header" data-view="edit" hidden>
+        <form class="pf-form" data-form="header" novalidate>
+          <div class="pf-header__row">
+            <div class="pf-avatar" data-hook="avatar-edit"></div>
+
+            <div class="pf-header__meta">
+              <label class="pf-field">
+                <span class="pf-field__label">Headline</span>
+                <input class="pf-field__input" type="text" name="headline" maxlength="160">
+              </label>
+              <label class="pf-field">
+                <span class="pf-field__label">Location</span>
+                <input class="pf-field__input" type="text" name="location" maxlength="120">
+              </label>
+              <label class="pf-field">
+                <span class="pf-field__label">Profile picture URL</span>
+                <input class="pf-field__input" type="url" name="profilePictureUrl" maxlength="500"
+                       placeholder="https://…">
+              </label>
+            </div>
+
+            <div class="pf-header__actions">
+              <button class="pf-button" type="submit">Save</button>
+              <button class="pf-button pf-button--ghost" type="button" data-action="cancel-edit">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </article>
+
+      <!-- ===== About ===== -->
+      <article class="pf-card">
+        <h2 class="pf-card__title">About</h2>
+
+        <p class="pf-about" data-view="view" data-hook="about-view">
+          <span class="pf-empty">Nothing here yet. Click Edit profile to add a short about.</span>
+        </p>
+
+        <label class="pf-field" data-view="edit" hidden>
+          <span class="pf-field__label">About</span>
+          <textarea class="pf-field__input pf-field__textarea" name="about" rows="5" maxlength="5000"
+                    form="pf-form-body"></textarea>
+        </label>
+      </article>
+
+      <!-- ===== Experience ===== -->
+      <article class="pf-card">
+        <div class="pf-card__head">
+          <h2 class="pf-card__title">Experience</h2>
+          <button class="pf-icon-btn" type="button" data-view="edit" data-action="add-experience" hidden>
+            + Add
+          </button>
+        </div>
+
+        <ul class="pf-list" data-view="view" data-hook="experience-view">
+          <li class="pf-empty">No experience listed yet.</li>
+        </ul>
+
+        <div class="pf-editable" data-view="edit" data-hook="experience-edit" hidden></div>
+      </article>
+
+      <!-- ===== Education ===== -->
+      <article class="pf-card">
+        <div class="pf-card__head">
+          <h2 class="pf-card__title">Education</h2>
+          <button class="pf-icon-btn" type="button" data-view="edit" data-action="add-education" hidden>
+            + Add
+          </button>
+        </div>
+
+        <ul class="pf-list" data-view="view" data-hook="education-view">
+          <li class="pf-empty">No education listed yet.</li>
+        </ul>
+
+        <div class="pf-editable" data-view="edit" data-hook="education-edit" hidden></div>
+      </article>
+
+      <!-- ===== Skills ===== -->
+      <article class="pf-card">
+        <div class="pf-card__head">
+          <h2 class="pf-card__title">Skills</h2>
+          <button class="pf-icon-btn" type="button" data-view="edit" data-action="add-skill" hidden>
+            + Add
+          </button>
+        </div>
+
+        <div class="pf-chips" data-view="view" data-hook="skills-view">
+          <span class="pf-empty">No skills listed yet.</span>
+        </div>
+
+        <div class="pf-editable pf-editable--chips" data-view="edit" data-hook="skills-edit" hidden></div>
+      </article>
+
+      <!-- Body-level form holds `about` textarea + edit lists.
+           Submit is the "Save" button below. -->
+      <form id="pf-form-body" data-form="body" data-view="edit" hidden>
+        <div class="pf-save-row">
+          <button class="pf-button" type="submit">Save changes</button>
+          <button class="pf-button pf-button--ghost" type="button" data-action="cancel-edit">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <script src="/profile-mf/js/constants.js"></script>
+  <script src="/profile-mf/js/utils.js"></script>
+  <script src="/profile-mf/js/validation.js"></script>
+  <script src="/profile-mf/js/api.js"></script>
+  <script src="/profile-mf/js/events.js"></script>
+  <script src="/profile-mf/js/app.js"></script>
+</body>
+</html>

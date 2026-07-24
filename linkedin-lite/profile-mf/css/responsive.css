@@ -1,0 +1,9 @@
+@media (max-width: 720px) {
+  .pf-header__row     { grid-template-columns: 72px 1fr; }
+  .pf-header__actions { grid-column: 1 / -1; flex-direction: row; align-items: stretch; }
+  .pf-avatar          { width: 72px; height: 72px; font-size: 24px; }
+  .pf-list__item      { grid-template-columns: 36px 1fr; }
+  .pf-list__marker    { width: 36px; height: 36px; font-size: 15px; }
+  .pf-editable__row   { grid-template-columns: 1fr; }
+  .pf-editable__row--single .pf-editable__row__remove { top: var(--space-1); right: var(--space-1); }
+}

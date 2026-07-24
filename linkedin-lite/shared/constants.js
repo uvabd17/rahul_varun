@@ -11,6 +11,7 @@
       LOGIN:    '#/login',
       REGISTER: '#/register',
       HOME:     '#/home',
+      PROFILE:  '#/profile',
     }),
 
     EVENTS: Object.freeze({

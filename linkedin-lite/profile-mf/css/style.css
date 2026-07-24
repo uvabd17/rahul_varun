@@ -1,0 +1,364 @@
+/* profile-mf — view and edit the current user's profile */
+
+.profile-mf {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.profile-mf__loading {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-text-mute);
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+.pf-header {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  box-shadow: var(--shadow-1);
+}
+
+.pf-header__row {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.pf-header__meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pf-header__name {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  letter-spacing: -0.01em;
+}
+
+.pf-header__headline,
+.pf-header__location {
+  margin: 0;
+  color: var(--color-text-mute);
+}
+
+.pf-header__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-end;
+}
+
+/* ============================================================
+   Avatar
+   ============================================================ */
+.pf-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 3px solid var(--color-surface);
+  box-shadow: var(--shadow-1);
+  flex-shrink: 0;
+}
+
+.pf-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ============================================================
+   Section card
+   ============================================================ */
+.pf-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-1);
+}
+
+.pf-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.pf-card__title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  letter-spacing: -0.01em;
+}
+
+.pf-about {
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--color-text);
+}
+
+/* ============================================================
+   Form fields
+   ============================================================ */
+.pf-form {
+  margin: 0;
+}
+
+.pf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: var(--space-3);
+}
+
+.pf-field__label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-mute);
+}
+
+.pf-field__input {
+  padding: 10px var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font: inherit;
+  background: #fff;
+  color: var(--color-text);
+  transition: border-color 120ms, box-shadow 120ms;
+  width: 100%;
+}
+
+.pf-field__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.15);
+}
+
+.pf-field__textarea {
+  resize: vertical;
+  min-height: 90px;
+  font-family: inherit;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.pf-button {
+  padding: 8px var(--space-4);
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 120ms;
+}
+
+.pf-button:hover { background: var(--color-primary-hover); }
+
+.pf-button--ghost {
+  background: transparent;
+  color: var(--color-text-mute);
+  border: 1px solid var(--color-border);
+}
+
+.pf-button--ghost:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.pf-icon-btn {
+  padding: 6px var(--space-3);
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.pf-icon-btn:hover {
+  background: var(--color-primary-soft);
+}
+
+.pf-remove-btn {
+  padding: 4px var(--space-2);
+  background: transparent;
+  color: var(--color-danger);
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-sm);
+}
+
+.pf-remove-btn:hover { text-decoration: underline; }
+
+.pf-save-row {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+/* ============================================================
+   Lists (view mode)
+   ============================================================ */
+.pf-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pf-list__item {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.pf-list__marker {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.pf-list__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.pf-list__sub {
+  margin: 2px 0 0;
+  color: var(--color-text-mute);
+  font-size: var(--font-size-sm);
+}
+
+.pf-list__desc {
+  margin: 6px 0 0;
+  color: var(--color-text);
+  white-space: pre-wrap;
+}
+
+.pf-empty {
+  color: var(--color-text-mute);
+  font-style: italic;
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================================
+   Edit lists
+   ============================================================ */
+.pf-editable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pf-editable__row {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--color-bg);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  position: relative;
+}
+
+.pf-editable__row .pf-field { margin-bottom: 0; }
+
+.pf-editable__row--single { grid-template-columns: 1fr; }
+
+.pf-editable__row--wide  { grid-column: 1 / -1; }
+
+.pf-editable__row__remove {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+}
+
+.pf-editable__row__check {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-mute);
+}
+
+.pf-editable--chips {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pf-editable__chip-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px var(--space-2);
+  background: var(--color-primary-soft);
+  border-radius: 999px;
+}
+
+.pf-editable__chip-input input {
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: var(--color-primary);
+  width: 120px;
+  outline: none;
+}
+
+.pf-editable__chip-input .pf-remove-btn {
+  color: var(--color-primary);
+  padding: 0 4px;
+}
+
+/* ============================================================
+   Chips
+   ============================================================ */
+.pf-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pf-chip {
+  padding: 4px var(--space-3);
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
