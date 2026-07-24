@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jobs — LinkedIn Lite</title>
+  <link rel="stylesheet" href="/shared/styles/tokens.css">
+  <link rel="stylesheet" href="/job-mf/css/style.css">
+  <link rel="stylesheet" href="/job-mf/css/responsive.css">
+</head>
+<body>
+
+  <section class="jb-page">
+
+    <header class="jb-toolbar">
+      <div class="jb-tabs" role="tablist">
+        <button class="jb-tab" type="button" data-action="tab" data-tab="browse"  role="tab">Browse</button>
+        <button class="jb-tab" type="button" data-action="tab" data-tab="applied" role="tab">My applications</button>
+        <button class="jb-tab" type="button" data-action="tab" data-tab="manage"  role="tab" data-admin-only hidden>Manage</button>
+      </div>
+    </header>
+
+    <!-- ===== Browse ===== -->
+    <section class="jb-panel" data-panel="browse">
+      <form class="jb-filters" data-form="filters">
+        <input class="jb-input" type="search" name="q" placeholder="Title or company">
+        <select class="jb-input" name="type">
+          <option value="">All types</option>
+          <option value="FULL_TIME">Full-time</option>
+          <option value="PART_TIME">Part-time</option>
+          <option value="CONTRACT">Contract</option>
+          <option value="INTERN">Intern</option>
+        </select>
+        <input class="jb-input" type="text" name="location" placeholder="Location">
+      </form>
+
+      <div class="jb-list" data-hook="browse-list">
+        <div class="jb-empty">Loading…</div>
+      </div>
+    </section>
+
+    <!-- ===== Applied ===== -->
+    <section class="jb-panel" data-panel="applied" hidden>
+      <div class="jb-list" data-hook="applied-list">
+        <div class="jb-empty">Loading…</div>
+      </div>
+    </section>
+
+    <!-- ===== Manage (admin) ===== -->
+    <section class="jb-panel" data-panel="manage" hidden data-admin-only>
+      <article class="jb-compose">
+        <h3 class="jb-compose__title" data-hook="compose-title">Post a job</h3>
+        <form class="jb-compose__form" data-form="upsert" novalidate>
+          <input type="hidden" name="id">
+          <div class="jb-compose__row">
+            <input class="jb-input" type="text" name="title" placeholder="Title" required maxlength="200">
+            <input class="jb-input" type="text" name="company" placeholder="Company" required maxlength="200">
+          </div>
+          <div class="jb-compose__row">
+            <input class="jb-input" type="text" name="location" placeholder="Location" maxlength="200">
+            <select class="jb-input" name="jobType" required>
+              <option value="FULL_TIME">Full-time</option>
+              <option value="PART_TIME">Part-time</option>
+              <option value="CONTRACT">Contract</option>
+              <option value="INTERN">Intern</option>
+            </select>
+          </div>
+          <textarea class="jb-input jb-input--textarea" name="description" rows="4" required
+                    placeholder="Describe the role"></textarea>
+          <div class="jb-compose__actions">
+            <button class="jb-button jb-button--ghost" type="button" data-action="reset-compose" hidden>Cancel edit</button>
+            <button class="jb-button" type="submit" data-hook="compose-submit">Post job</button>
+          </div>
+        </form>
+      </article>
+
+      <h3 class="jb-manage-title">All jobs</h3>
+      <div class="jb-list" data-hook="manage-list">
+        <div class="jb-empty">Loading…</div>
+      </div>
+
+      <div class="jb-applicants" data-hook="applicants" hidden>
+        <h3 class="jb-manage-title">Applicants for <span data-hook="applicants-for"></span></h3>
+        <div class="jb-list" data-hook="applicants-list"></div>
+      </div>
+    </section>
+  </section>
+
+  <script src="/job-mf/js/constants.js"></script>
+  <script src="/job-mf/js/utils.js"></script>
+  <script src="/job-mf/js/api.js"></script>
+  <script src="/job-mf/js/events.js"></script>
+  <script src="/job-mf/js/app.js"></script>
+</body>
+</html>

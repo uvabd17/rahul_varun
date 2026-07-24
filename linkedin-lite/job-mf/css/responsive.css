@@ -1,0 +1,6 @@
+@media (max-width: 720px) {
+  .jb-filters           { grid-template-columns: 1fr; }
+  .jb-compose__row      { grid-template-columns: 1fr; }
+  .jb-card__head        { grid-template-columns: 40px 1fr; }
+  .jb-card__actions     { grid-column: 1 / -1; justify-content: flex-end; margin-top: var(--space-2); }
+}
